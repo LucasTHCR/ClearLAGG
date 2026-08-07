@@ -1,0 +1,99 @@
+name: Clearlagg
+version: '1.0-RELEASE'
+description: >
+  Designed with reducing lag as the primary goal, Clearlagg targets multiple
+  sources of lag/exploits that plague Minecraft servers. Entity culling,
+  spawner limiting, mob-egg limiting, breeding limiting, per-item live-time,
+  TNT lag reduction, TPS/RAM monitoring, chunk analysis, GC monitoring,
+  profilers and samplers - full control over what matters for your server.
+author: LucasTHCR
+website: https://dc.gg/paperstream
+
+main: de.empireblocks.clearlagg.Clearlagg
+api-version: '1.21'
+load: POSTWORLD
+
+# PlaceholderAPI is completely optional. If it's present on the server,
+# Clearlagg will register its placeholders automatically; if not, Clearlagg
+# runs perfectly fine without it.
+softdepend: [PlaceholderAPI]
+
+commands:
+  lagg:
+    description: Main Clearlagg command.
+    usage: /lagg <clear|check|reload|killmobs|area|tpchunk|admin|gc|tps|halt|sampleMemory|sampleTicks|unloadchunks|profile|memory|performance>
+    aliases: [clearlag, clearlagg]
+
+permissions:
+  lagg.*:
+    description: Grants access to every Clearlagg command.
+    default: op
+    children:
+      lagg.clear: true
+      lagg.check: true
+      lagg.reload: true
+      lagg.killmobs: true
+      lagg.area: true
+      lagg.tpchunk: true
+      lagg.admin: true
+      lagg.gc: true
+      lagg.tps: true
+      lagg.halt: true
+      lagg.samplememory: true
+      lagg.sampleticks: true
+      lagg.unloadchunks: true
+      lagg.profile: true
+      lagg.memory: true
+      lagg.performance: true
+      lagg.notify: true
+  lagg.clear:
+    description: Allows clearing configured entities.
+    default: op
+  lagg.check:
+    description: Allows viewing world/chunk information.
+    default: op
+  lagg.reload:
+    description: Allows reloading the Clearlagg configuration.
+    default: op
+  lagg.killmobs:
+    description: Allows killing configured mobs.
+    default: op
+  lagg.area:
+    description: Allows removing entities in a given radius.
+    default: op
+  lagg.tpchunk:
+    description: Allows teleporting to a given chunk.
+    default: op
+  lagg.admin:
+    description: Allows managing Clearlagg modules.
+    default: op
+  lagg.gc:
+    description: Allows force-requesting garbage collection.
+    default: op
+  lagg.tps:
+    description: Allows viewing the estimated TPS.
+    default: op
+  lagg.halt:
+    description: Allows temporarily halting basic server functions.
+    default: op
+  lagg.samplememory:
+    description: Allows sampling memory usage and GC timings.
+    default: op
+  lagg.sampleticks:
+    description: Allows sampling tick durations.
+    default: op
+  lagg.unloadchunks:
+    description: Allows attempting to unload chunks.
+    default: op
+  lagg.profile:
+    description: Allows profiling server activity.
+    default: op
+  lagg.memory:
+    description: Allows viewing the memory heap in realtime.
+    default: op
+  lagg.performance:
+    description: Allows viewing main-thread usage in realtime.
+    default: op
+  lagg.notify:
+    description: Receive Clearlagg's automatic threshold/GC notifications.
+    default: op

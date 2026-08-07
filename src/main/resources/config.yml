@@ -1,0 +1,396 @@
+# =====================================================================
+#                       Clearlagg Configuration
+#   Full control over every module. Disable anything you don't need -
+#   Clearlagg only activates the systems you enable, so it stays
+#   extremely lightweight on a stock configuration.
+# =====================================================================
+
+settings:
+  # Locale-independent tag prefixed to all plugin chat messages.
+  prefix: "&8[&bClearlagg&8] &7"
+  # Remove old log files from the server's /logs folder on every startup.
+  clean-logs-on-startup:
+    enabled: false
+    # Delete logs older than this many days.
+    older-than-days: 14
+  # Language of built-in messages. Supported values (case-insensitive):
+  #   english, german, french, spanish, russian, polish, czech, japanese,
+  #   korean, brazilianportuguese, chinesesimplified, chinesetraditional
+  # Falls back to "english" if the given language file is missing.
+  language: "english"
+  # Print a small plugin banner to console on enable.
+  startup-banner: true
+  # Repeatedly check Modrinth for newer versions (async, non-blocking).
+  # Notifies console + online players with lagg.notify if one is found.
+  check-for-updates: true
+  # How often (in minutes) to re-check. Runs once immediately on startup,
+  # then again every N minutes. Modrinth's API doesn't need to be hit every
+  # couple of minutes, so keep this reasonable (default: every 30 minutes).
+  update-check-interval-minutes: 30
+
+# =====================================================================
+# PLACEHOLDERAPI INTEGRATION (fully optional)
+#   If PlaceholderAPI is not installed on the server, this section is
+#   simply ignored and Clearlagg works exactly the same without it.
+#   Registered placeholders when enabled:
+#     %clearlagg_tps%              - current estimated TPS
+#     %clearlagg_tps_colored%      - TPS with a color code based on health
+#     %clearlagg_ram_used%         - used RAM in MB
+#     %clearlagg_ram_max%          - max RAM in MB
+#     %clearlagg_ram_percent%      - used RAM as a percentage
+#     %clearlagg_entities_world%   - live entity count in the player's world
+#     %clearlagg_entities_total%   - live entity count across all worlds
+#     %clearlagg_chunks_loaded%    - loaded chunk count in the player's world
+#     %clearlagg_last_clear_amount%- amount removed by the last /lagg clear
+#     %clearlagg_halted%           - "true"/"false" whether halt mode is active
+# =====================================================================
+placeholderapi:
+  enabled: true
+  # Automatically clear entities via /lagg clear whenever a registered
+  # placeholder expansion trigger fires. This lets other plugins (boards,
+  # holograms, join-messages, etc.) indirectly trigger a clear just by
+  # requesting a placeholder, without needing their own scheduler.
+  auto-clear-on-placeholder-request:
+    enabled: false
+    # Which placeholder, when requested, triggers the auto clear.
+    trigger-placeholder: "clearlagg_autoclear"
+    # Minimum seconds between two auto-clears triggered this way.
+    cooldown-seconds: 300
+
+# =====================================================================
+# ENTITY CLEARING (/lagg clear)
+# =====================================================================
+entity-clear:
+  enabled: true
+  # Automatically run a clear on this interval (in seconds). 0 = disabled.
+  # This is Clearlagg's built-in scheduled auto-clean, independent of PAPI.
+  auto-clear-interval: 600
+  # Warn players in chat before an automatic clear happens.
+  warn-before-clear:
+    enabled: true
+    # Seconds before the clear to send the warning.
+    warn-seconds-before: 10
+    message: "&eEntities will be cleared in &c{seconds} &eseconds!"
+  # Message broadcast after a clear completes.
+  broadcast-message: "&aCleared &e{amount} &aentities!"
+  # Only broadcast if the amount cleared is >= this number.
+  broadcast-min-amount: 1
+  # Worlds to exclude entirely from automatic AND manual clears.
+  excluded-worlds: []
+  # Entity types to remove. Use Bukkit EntityType names.
+  entities:
+    DROPPED_ITEM: true
+    ARROW: true
+    EXPERIENCE_ORB: false
+    ITEM_FRAME: false
+    ARMOR_STAND: false
+    BOAT: false
+    MINECART: false
+    EGG: true
+    SNOWBALL: true
+    FIREBALL: true
+    SPLASH_POTION: true
+    TRIDENT: true
+    FISHING_BOBBER: true
+  # Never remove named (custom-name) entities.
+  ignore-named-entities: true
+  # Never remove entities sitting inside a vehicle/leashed.
+  ignore-leashed-entities: true
+  # Never remove tamed entities (pets).
+  ignore-tamed-entities: true
+
+# =====================================================================
+# MOB KILLING (/lagg killmobs)
+# =====================================================================
+kill-mobs:
+  enabled: true
+  auto-kill-interval: 0
+  broadcast-message: "&aKilled &e{amount} &amobs!"
+  excluded-worlds: []
+  ignore-named-entities: true
+  ignore-tamed-entities: true
+  ignore-leashed-entities: true
+  # Mob types to kill. Use Bukkit EntityType names.
+  mobs:
+    ZOMBIE: true
+    SKELETON: true
+    SPIDER: true
+    CREEPER: true
+    ENDERMAN: true
+    WITCH: true
+    SLIME: true
+    PHANTOM: true
+    DROWNED: true
+    HUSK: true
+    STRAY: true
+    PILLAGER: true
+    VINDICATOR: true
+    EVOKER: true
+    RAVAGER: true
+    COW: false
+    PIG: false
+    SHEEP: false
+    CHICKEN: false
+    VILLAGER: false
+    WOLF: false
+    CAT: false
+    HORSE: false
+
+# =====================================================================
+# ENTITY LIMITERS - hard per-chunk caps enforced live, preventing
+# overcrowding before it ever becomes a lag spike.
+# =====================================================================
+limiters:
+  enabled: true
+  # How often (in ticks) each limiter scans loaded chunks. 20 ticks = 1s.
+  scan-interval-ticks: 100
+
+  entity-limiter:
+    enabled: true
+    # Max entities of a given type per chunk before excess is removed.
+    per-chunk-limits:
+      DROPPED_ITEM: 40
+      ARROW: 20
+      BOAT: 4
+      MINECART: 4
+      ITEM_FRAME: 30
+      ARMOR_STAND: 15
+      EXPERIENCE_ORB: 60
+    # Global default limit for any entity type not explicitly listed. -1 = no default limit.
+    default-limit: -1
+
+  mob-limiter:
+    enabled: true
+    # Max living (hostile+passive) mobs per chunk.
+    per-chunk-limit: 25
+    # Max living mobs per world (0 = unlimited).
+    per-world-limit: 0
+    # Cancel natural spawns once the limit is hit rather than killing after the fact.
+    prevent-spawns-at-limit: true
+
+  hopper-limiter:
+    enabled: false
+    per-chunk-limit: 8
+
+  redstone-limiter:
+    enabled: false
+    # Max redstone-active blocks (repeaters/comparators/pistons ticking) per chunk per interval.
+    per-chunk-limit: 200
+
+# =====================================================================
+# MOB SPAWNER LIMITER
+# =====================================================================
+spawner-limiter:
+  enabled: true
+  # Max mob spawners of the same type allowed within radius (blocks) of one another.
+  max-spawners-per-radius: 4
+  radius: 16
+  # Action when limit exceeded: "PREVENT_PLACE", "BREAK", "DENY_SILENT"
+  action-on-exceed: "PREVENT_PLACE"
+  message-on-deny: "&cYou cannot place more spawners here! (limit: {limit} within {radius} blocks)"
+  # Globally multiply/override spawner mob-spawn-delay (in ticks). 0 = don't modify.
+  force-spawn-delay: 0
+  # Reduce simultaneous nearby-player requirement lag by capping spawner activation range.
+  max-activation-range: 16
+
+# =====================================================================
+# MOB EGG LIMITER
+# =====================================================================
+mob-egg-limiter:
+  enabled: true
+  # Max mobs spawned via spawn egg per player within the cooldown window.
+  max-per-player: 10
+  cooldown-seconds: 60
+  message-on-deny: "&cYou've reached the mob egg spawn limit! Try again in {seconds}s."
+  # Per-world overrides, world-name: max-per-player
+  world-overrides: {}
+
+# =====================================================================
+# MOB BREEDING LIMITER
+# =====================================================================
+breeding-limiter:
+  enabled: true
+  # Max breedable (age >= 0, non-baby) animals of the same type per chunk before breeding is denied.
+  max-per-chunk: 30
+  message-on-deny: "&cToo many animals nearby to breed further! (limit: {limit} per chunk)"
+  # Animal types this limiter applies to. Empty list = all breedable animals.
+  applies-to: []
+
+# =====================================================================
+# PER-ITEM ENTITY LIVE-TIME (item despawn rate control)
+# =====================================================================
+item-livetime:
+  enabled: true
+  # Default live time in seconds before a dropped item despawns. Vanilla default is 300 (5 min).
+  default-seconds: 300
+  # Per-material overrides, in seconds. -1 = never despawns.
+  overrides:
+    DIAMOND: 600
+    NETHERITE_INGOT: -1
+    NETHERITE_SCRAP: -1
+    TOTEM_OF_UNDYING: -1
+    ELYTRA: -1
+    ENCHANTED_BOOK: 450
+    EMERALD: 450
+    NETHER_STAR: -1
+    DRAGON_EGG: -1
+
+# =====================================================================
+# TNT / EXPLOSION LAG REDUCTION
+# =====================================================================
+tnt:
+  enabled: true
+  # Limit how many TNT entities can be primed and ticking at once per chunk.
+  max-primed-per-chunk: 25
+  # Prevent TNT from chain-igniting other TNT within this radius (blocks). 0 = vanilla behavior.
+  chain-reaction-radius-limit: 0
+  # Merge/stack overlapping primed TNT into a single explosion calculation.
+  merge-explosions: true
+  merge-radius: 1.0
+  # Cap the number of block changes a single explosion can cause (protects against huge craters lagging the server).
+  max-blocks-per-explosion: 500
+  # Disable TNT block-breaking entirely (explosion still deals damage/knockback).
+  disable-block-damage: false
+  # Optimize explosion raytracing (faster, very slightly less "vanilla accurate").
+  fast-explosion-calculation: true
+
+# =====================================================================
+# CHUNK ANALYSIS (/lagg check)
+# =====================================================================
+chunk-analysis:
+  enabled: true
+  # How many top overcrowded chunks to display per /lagg check.
+  results-per-page: 10
+  # Weight multipliers used when scoring a chunk's "load" for /lagg check and /lagg profile.
+  score-weights:
+    entity: 1.0
+    tile-entity: 1.5
+    hopper: 2.0
+    redstone: 1.2
+
+# =====================================================================
+# CHUNK UNLOADING (/lagg unloadchunks)
+# =====================================================================
+chunk-unloader:
+  enabled: true
+  # Auto-unload unused chunks on an interval (seconds). 0 = manual only.
+  auto-unload-interval: 0
+  # Don't unload chunks within this radius (chunks) of any online player.
+  player-safe-radius: 4
+
+# =====================================================================
+# AI / PATHFINDING LIMITER - reduces CPU cost of mob AI ticking.
+# =====================================================================
+ai-limiter:
+  enabled: false
+  # Disable complex AI goals (pathfinding to targets, etc.) for mobs beyond this distance from any player.
+  disable-ai-beyond-blocks: 48
+  # Fully freeze (no AI, no gravity tick) mobs beyond this distance. 0 = disabled.
+  freeze-beyond-blocks: 0
+  # Reduce mob look/wander tick-rate by processing only 1 in N ticks.
+  ai-tick-rate-divisor: 1
+
+# =====================================================================
+# TPS / RAM METER - background monitor capable of executing commands
+# when thresholds are crossed.
+#
+# Every trigger is opt-in: nothing here runs until you set enabled: true.
+# Conditions are TPS_BELOW and RAM_ABOVE_PERCENT, compared against "value".
+# Placeholders usable inside commands: {tps}, {ram_used}, {ram_max},
+# {ram_percent}. Commands run from console, so no "/" prefix.
+#
+# Careful with "say": it broadcasts to every player on the server. Prefer a
+# staff-only channel or a plain console log unless you really want that.
+# =====================================================================
+tps-meter:
+  enabled: true
+  # How often (in seconds) to evaluate thresholds.
+  check-interval-seconds: 10
+  triggers:
+    - name: "high-ram-usage"
+      enabled: false
+      condition: "RAM_ABOVE_PERCENT"
+      value: 90.0
+      commands:
+        - "say [Clearlagg] RAM usage high: {ram_percent}%"
+      cooldown-seconds: 300
+
+# =====================================================================
+# GARBAGE COLLECTION MONITORING
+# =====================================================================
+gc-monitor:
+  enabled: true
+  # Warn in console/ops chat when a single GC pause exceeds this many milliseconds.
+  warn-pause-ms: 500
+  notify-ops-in-game: true
+  message: "&c[Clearlagg] Long GC pause detected: &e{duration}ms &c(collector: {collector})"
+
+# =====================================================================
+# FULL-TICK SAMPLER (/lagg sampleTicks)
+# =====================================================================
+tick-sampler:
+  enabled: true
+  # Maximum ticks that can be requested in a single sample to prevent abuse.
+  max-sample-ticks: 12000
+  # Flag any single tick over this duration (ms) as a "spike" in the results.
+  spike-threshold-ms: 50.0
+
+# =====================================================================
+# MEMORY SAMPLER (/lagg sampleMemory)
+# =====================================================================
+memory-sampler:
+  enabled: true
+  # Maximum sample duration in seconds.
+  max-sample-seconds: 600
+  # Samples taken per second while sampling.
+  samples-per-second: 2
+
+# =====================================================================
+# PROFILER (/lagg profile)
+# =====================================================================
+profiler:
+  enabled: true
+  max-profile-seconds: 300
+  types:
+    - "redstone"
+    - "entities"
+    - "tile-entities"
+    - "chunk-loads"
+
+# =====================================================================
+# HALT MODE (/lagg halt)
+# =====================================================================
+halt:
+  enabled: true
+  # Which systems get disabled while halt mode is active.
+  disable:
+    mob-spawning: true
+    item-merging: false
+    redstone: false
+    fluid-flow: false
+    hopper-transfer: true
+  broadcast-message: "&c&lServer functions have been temporarily halted by an admin!"
+  resume-message: "&a&lServer functions have been resumed."
+
+# =====================================================================
+# COMMAND / PERMISSIONS
+# =====================================================================
+commands:
+  # Require confirmation (re-run command within 10s) for destructive commands.
+  confirm-destructive-commands: true
+  confirmation-window-seconds: 10
+  destructive-commands:
+    - "clear"
+    - "killmobs"
+    - "area"
+    - "unloadchunks"
+    - "gc"
+
+# =====================================================================
+# PROFILES - saved presets of settings that can be swapped via
+# /lagg admin profile <name>. Left empty by default.
+# =====================================================================
+profiles: {}
+
+# Config version - do not edit. Used for automatic migrations.
+config-version: 1
