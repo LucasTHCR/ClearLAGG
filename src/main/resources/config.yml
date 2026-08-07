@@ -17,6 +17,10 @@ settings:
   #   english, german, french, spanish, russian, polish, czech, japanese,
   #   korean, brazilianportuguese, chinesesimplified, chinesetraditional
   # Falls back to "english" if the given language file is missing.
+  #
+  # Every text the plugin sends lives in lang/messages_<language>.yml, not in
+  # this file. Edit the language file to reword anything, including the clear
+  # and kill-mobs broadcasts and the limiter denial messages.
   language: "english"
   # Print a small plugin banner to console on enable.
   startup-banner: true
@@ -70,9 +74,6 @@ entity-clear:
     enabled: true
     # Seconds before the clear to send the warning.
     warn-seconds-before: 10
-    message: "&eEntities will be cleared in &c{seconds} &eseconds!"
-  # Message broadcast after a clear completes.
-  broadcast-message: "&aCleared &e{amount} &aentities!"
   # Only broadcast if the amount cleared is >= this number.
   broadcast-min-amount: 1
   # Worlds to exclude entirely from automatic AND manual clears.
@@ -105,7 +106,6 @@ entity-clear:
 kill-mobs:
   enabled: true
   auto-kill-interval: 0
-  broadcast-message: "&aKilled &e{amount} &amobs!"
   excluded-worlds: []
   ignore-named-entities: true
   ignore-tamed-entities: true
@@ -187,7 +187,6 @@ spawner-limiter:
   radius: 16
   # Action when limit exceeded: "PREVENT_PLACE", "BREAK", "DENY_SILENT"
   action-on-exceed: "PREVENT_PLACE"
-  message-on-deny: "&cYou cannot place more spawners here! (limit: {limit} within {radius} blocks)"
   # Globally multiply/override spawner mob-spawn-delay (in ticks). 0 = don't modify.
   force-spawn-delay: 0
   # Reduce simultaneous nearby-player requirement lag by capping spawner activation range.
@@ -201,7 +200,6 @@ mob-egg-limiter:
   # Max mobs spawned via spawn egg per player within the cooldown window.
   max-per-player: 10
   cooldown-seconds: 60
-  message-on-deny: "&cYou've reached the mob egg spawn limit! Try again in {seconds}s."
   # Per-world overrides, world-name: max-per-player
   world-overrides: {}
 
@@ -212,7 +210,6 @@ breeding-limiter:
   enabled: true
   # Max breedable (age >= 0, non-baby) animals of the same type per chunk before breeding is denied.
   max-per-chunk: 30
-  message-on-deny: "&cToo many animals nearby to breed further! (limit: {limit} per chunk)"
   # Animal types this limiter applies to. Empty list = all breedable animals.
   applies-to: []
 
@@ -323,7 +320,6 @@ gc-monitor:
   # Warn in console/ops chat when a single GC pause exceeds this many milliseconds.
   warn-pause-ms: 500
   notify-ops-in-game: true
-  message: "&c[Clearlagg] Long GC pause detected: &e{duration}ms &c(collector: {collector})"
 
 # =====================================================================
 # FULL-TICK SAMPLER (/lagg sampleTicks)
@@ -369,8 +365,6 @@ halt:
     redstone: false
     fluid-flow: false
     hopper-transfer: true
-  broadcast-message: "&c&lServer functions have been temporarily halted by an admin!"
-  resume-message: "&a&lServer functions have been resumed."
 
 # =====================================================================
 # COMMAND / PERMISSIONS

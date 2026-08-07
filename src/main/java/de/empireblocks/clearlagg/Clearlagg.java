@@ -454,9 +454,7 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
         this.lastClearAmount = removed;
         int minBroadcast = this.cfg.getInt("entity-clear.broadcast-min-amount", 1);
         if (removed >= minBroadcast) {
-            String message = this.cfg.getString("entity-clear.broadcast-message", "&aCleared &e{amount} &aentities!")
-                .replace("{amount}", String.valueOf(removed));
-            this.broadcastToAll(ChatColor.translateAlternateColorCodes('&', message));
+            this.broadcastToAll(this.msg("clear-broadcast").replace("{amount}", String.valueOf(removed)));
         }
 
         return removed;
@@ -542,8 +540,7 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
         }
 
         if (killed > 0) {
-            String message = this.cfg.getString("kill-mobs.broadcast-message", "&aKilled &e{amount} &amobs!").replace("{amount}", String.valueOf(killed));
-            this.broadcastToAll(ChatColor.translateAlternateColorCodes('&', message));
+            this.broadcastToAll(this.msg("killmobs-broadcast").replace("{amount}", String.valueOf(killed)));
         }
 
         return killed;
@@ -694,11 +691,9 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
         if (this.moduleAdmin.isEnabled("gc-monitor") && this.cfg.getBoolean("gc-monitor.enabled", true)) {
             long warnMs = this.cfg.getLong("gc-monitor.warn-pause-ms", 500L);
             if (durationMs >= warnMs) {
-                String message = ChatColor.translateAlternateColorCodes(
-                    '&',
-                    this.cfg.getString("gc-monitor.message", "&c[Clearlagg] Long GC pause detected: &e{duration}ms &c(collector: {collector})")
-                        .replace("{duration}", String.valueOf(durationMs)).replace("{collector}", collectorName)
-                );
+                String message = this.msg("gc-pause-warning")
+                    .replace("{duration}", String.valueOf(durationMs))
+                    .replace("{collector}", collectorName);
                 this.getLogger().warning(ChatColor.stripColor(message));
                 if (this.cfg.getBoolean("gc-monitor.notify-ops-in-game", true)) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
@@ -895,9 +890,8 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
                     if (count >= (long)max) {
                         event.setCancelled(true);
                         if (event.getBreeder() instanceof Player) {
-                            String message = this.cfg.getString("breeding-limiter.message-on-deny", "&cToo many animals nearby!")
-                                .replace("{limit}", String.valueOf(max));
-                            ((Player)event.getBreeder()).sendMessage(this.prefix + ChatColor.translateAlternateColorCodes('&', message));
+                            String message = this.msg("breeding-limit-reached").replace("{limit}", String.valueOf(max));
+                            ((Player)event.getBreeder()).sendMessage(this.prefix + message);
                         }
                     }
                 }
@@ -918,9 +912,10 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
                 if (count >= max) {
                     String action = this.cfg.getString("spawner-limiter.action-on-exceed", "PREVENT_PLACE");
                     if (!"DENY_SILENT".equalsIgnoreCase(action)) {
-                        String message = this.cfg.getString("spawner-limiter.message-on-deny", "&cYou cannot place more spawners here!")
-                            .replace("{limit}", String.valueOf(max)).replace("{radius}", String.valueOf(radius));
-                        event.getPlayer().sendMessage(this.prefix + ChatColor.translateAlternateColorCodes('&', message));
+                        String message = this.msg("spawner-limit-reached")
+                            .replace("{limit}", String.valueOf(max))
+                            .replace("{radius}", String.valueOf(radius));
+                        event.getPlayer().sendMessage(this.prefix + message);
                     }
 
                     event.setCancelled(true);
@@ -981,9 +976,9 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
 
                     if (timestamps.size() >= max) {
                         long remaining = (cooldownMs - (now - timestamps.peekFirst())) / 1000L;
-                        String message = this.cfg.getString("mob-egg-limiter.message-on-deny", "&cYou've reached the mob egg spawn limit! Try again in {seconds}s.")
+                        String message = this.msg("mob-egg-limit-reached")
                             .replace("{seconds}", String.valueOf(Math.max(0L, remaining)));
-                        player.sendMessage(this.prefix + ChatColor.translateAlternateColorCodes('&', message));
+                        player.sendMessage(this.prefix + message);
                         event.setCancelled(true);
                     } else {
                         timestamps.addLast(now);
@@ -1335,10 +1330,7 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
 
         boolean newState = !this.haltManager.isHalted();
         this.haltManager.setHalted(newState);
-        String message = newState
-            ? this.cfg.getString("halt.broadcast-message", this.msg("halt-enabled"))
-            : this.cfg.getString("halt.resume-message", this.msg("halt-disabled"));
-        this.broadcastToAll(ChatColor.translateAlternateColorCodes('&', message));
+        this.broadcastToAll(this.msg(newState ? "halt-enabled" : "halt-disabled"));
         return true;
     }
 
