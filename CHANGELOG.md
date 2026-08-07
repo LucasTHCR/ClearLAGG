@@ -24,6 +24,11 @@
 - Filled in fifteen messages that only existed in English and German. The other
   ten languages silently fell back to English for command usage, sampler
   results, profiler output and several errors.
+- Messages added in a new version now resolve on servers that already have a
+  language file. Bukkit never overwrites an existing `lang/messages_*.yml`, and
+  the fallback pointed at the English file on disk, which was equally outdated,
+  so a new key printed `[Missing message: ...]`. Defaults now come from the copy
+  inside the jar, in the configured language.
 - PlaceholderAPI placeholders were lowercased using the system default locale,
   which broke them on servers running a Turkish locale. They now use
   `Locale.ROOT`.

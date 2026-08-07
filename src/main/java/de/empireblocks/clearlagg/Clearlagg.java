@@ -18,6 +18,11 @@
 package de.empireblocks.clearlagg;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -301,10 +306,41 @@ public final class Clearlagg extends JavaPlugin implements Listener, CommandExec
         }
 
         this.lang = YamlConfiguration.loadConfiguration(langFile);
-        File englishFile = new File(langDir, "messages_english.yml");
-        if (englishFile.exists() && !englishFile.equals(langFile)) {
-            YamlConfiguration englishDefaults = YamlConfiguration.loadConfiguration(englishFile);
-            ((YamlConfiguration)this.lang).setDefaults(englishDefaults);
+        // Defaults come from the jar, not from disk: an existing language file is
+        // never overwritten on update, so a file written by an older version is
+        // missing every key added since. Falling back to the bundled copy keeps
+        // those messages translated instead of printing a missing-message marker.
+        this.lang.setDefaults(this.bundledDefaults(normalized));
+    }
+
+    /** Bundled messages for the given language, backed by the bundled English set. */
+    private YamlConfiguration bundledDefaults(String language) {
+        YamlConfiguration merged = new YamlConfiguration();
+        for (String key : language.equals("english") ? new String[]{"english"} : new String[]{"english", language}) {
+            YamlConfiguration bundled = this.loadBundledLanguage(key);
+            if (bundled == null) {
+                continue;
+            }
+
+            for (String path : bundled.getKeys(false)) {
+                merged.set(path, bundled.get(path));
+            }
+        }
+
+        return merged;
+    }
+
+    private YamlConfiguration loadBundledLanguage(String language) {
+        InputStream in = this.getResource("lang/messages_" + language + ".yml");
+        if (in == null) {
+            return null;
+        }
+
+        try (Reader reader = new InputStreamReader(in, StandardCharsets.UTF_8)) {
+            return YamlConfiguration.loadConfiguration(reader);
+        } catch (IOException ex) {
+            this.getLogger().log(Level.WARNING, "Could not read bundled language '" + language + "'", ex);
+            return null;
         }
     }
 
