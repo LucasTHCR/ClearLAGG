@@ -10,9 +10,20 @@
   Triggers are now opt-in.
 - Clearlagg is now open source under the GNU General Public License v3.0.
   Source: https://github.com/LucasTHCR/ClearLAGG
+- Every player-facing text now comes from `lang/messages_<language>.yml`. The
+  clear and kill-mobs broadcasts, the spawner, mob-egg and breeding denial
+  messages, the GC pause warning and the halt/resume broadcasts used to be read
+  from `config.yml`, which only ever held English. Reword them in the language
+  file from now on; the corresponding `config.yml` keys are gone.
 
 ### Fixed
 
+- Output is no longer half English on a translated server. With
+  `settings.language` set to anything but English, the messages listed above
+  stayed English while the rest of the plugin was translated.
+- Filled in fifteen messages that only existed in English and German. The other
+  ten languages silently fell back to English for command usage, sampler
+  results, profiler output and several errors.
 - PlaceholderAPI placeholders were lowercased using the system default locale,
   which broke them on servers running a Turkish locale. They now use
   `Locale.ROOT`.
