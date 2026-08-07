@@ -86,7 +86,7 @@ Available when PlaceholderAPI is installed:
 mvn clean package
 ```
 
-The shaded jar lands in `target/clearlagg-1.0-RELEASE.jar`. bStats is shaded and
+The shaded jar lands in `target/clearlagg-1.1-RELEASE.jar`. bStats is shaded and
 relocated into `de.empireblocks.clearlagg.libs.bstats`; paper-api and
 PlaceholderAPI are `provided` and stay out of the jar.
 

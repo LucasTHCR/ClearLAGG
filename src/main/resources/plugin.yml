@@ -1,5 +1,5 @@
 name: Clearlagg
-version: '1.0-RELEASE'
+version: '${project.version}'
 description: >
   Designed with reducing lag as the primary goal, Clearlagg targets multiple
   sources of lag/exploits that plague Minecraft servers. Entity culling,
